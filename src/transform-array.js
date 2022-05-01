@@ -14,43 +14,39 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 
- function transform(arr) {
-  let arrayFinish = [];
-  arrayFinish = arr;
-  if (arrayFinish !== {} && typeof arrayFinish !== Boolean && typeof arrayFinish !== Number && arrayFinish !== null && arrayFinish !== undefined ){
-  for(let i=0; i< arrayFinish.length; i++){
-    if(arrayFinish[i] == '--double-next'){
-      if(arrayFinish[i+1] !== ''){
-         arrayFinish[i] = arrayFinish[i+1];
-      } 
-    }
-    if(arrayFinish[i] == '--double-prev'){
-      if(arrayFinish[i-1] !== ''){
-         arrayFinish[i] = arrayFinish[i-1];
-      }
-    } 
-    if(arrayFinish[i] == '--discard-next'){
-      if(arrayFinish[i+1] !== ''){
-         arrayFinish.splice(arrayFinish[i-1],2)
-      }
-    } 
-    if(arrayFinish[i] == '--discard-prev'){
-      if(arrayFinish[i-1] !== ''){
-         arrayFinish.splice(arrayFinish[i-2],1)
-      }else{
-        arrayFinish.splice(arrayFinish[i-1],1)
-      }
-  }
-  
-  }
-  return arrayFinish;
+ function transform(arr){
+  if(Array.isArray(arr)){
+      let result =[];
+      if(arr.some((item) => typeof item === "string")){
+          for (let i=0; i<arr.length; i++){
+              let lastElement = result[result.length -1];
+              if(arr[i] === "--double-prev"){
+                  if(typeof arr[i-1] === 'number' && arr[i-2] !== "--discard-next"){
+                      console.log('a');
+                      result.push(lastElement);
+                  }
+              }else if(arr[i] === "--discard-prev"){
+                  if(typeof arr[i-1] === 'number'){
+                      result.pop();
+                  }
+              }else if(arr[i] === "--double-next"){
+                  if(typeof arr[i+1] === 'number'){
+                      result.push(arr[i+1]);
+                  }
+              }else if(arr[i] === "--discard-next"){
+                  if(typeof (arr.indexOf('--discard-next')+1) === 'number'){
+                      arr.splice((arr.indexOf('--discard-next')+1),1);
+                  }
+              }else {
+                  result.push(arr[i]);
+              }
+          }
+      }else {return arr;}
+      return result;
   } else {
-    return new Error("\'arr\' parameter must be an instance of the Array!");
+      throw new Error("'arr' parameter must be an instanse of the Array!")
   }
-  
 }
-  
-
 
 
 module.exports = {
